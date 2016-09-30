@@ -3,45 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Tracer
 {
-    public struct ParameterInfo
+    internal class MethodInformation
     {
-        public ParameterInfo(string name, Type type)
-            : this()
+        private List<MethodInformation> childList;
+        private Stopwatch StopWatching;
+        private MethodBase methodBase;
+
+        internal MethodInformation(MethodBase MBase)
         {
-            Name = name;
-            Type = type;
+            childList = new List<MethodInformation>();
+            methodBase = MBase;
+            StopWatching = Stopwatch.StartNew();
         }
 
-        public string Name { get; }
-        public Type Type { get; }
-    }
-
-    class MethodInformation
-    {
-        public MethodInformation(string className, string methodName, List<ParameterInfo> parameters)
+        internal void AddChild(MethodInformation methodinfo)
         {
-            ClassName = className;
-            MethodName = methodName;
-            Parameters = parameters;
-
-            StartTime = DateTime.Now;
-            FinishTime = DateTime.Now;
-
-           
+            childList.Add(methodinfo);
         }
-       
 
-        public string ClassName { get; }
-        public string MethodName { get; }
-        public List<ParameterInfo> Parameters { get; }
-        public DateTime StartTime { get; }
-        public DateTime FinishTime { get; private set; }
+        internal string Name => methodBase.Name;
+        internal string Class => methodBase.DeclaringType.Name;
+        internal int ParametrsCount => methodBase.GetParameters().Length;
+        internal long ExecTime => StopWatching.ElapsedMilliseconds;
 
 
-       
+        internal void StopTraceMethod()
+        {
+            StopWatching.Stop();
+        }
     }
 }
 

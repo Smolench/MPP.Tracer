@@ -8,6 +8,6 @@ namespace Tracer
 {
     interface ITraceResultFormatter
     {
-        void Format(TraceResult traceResult);
+        void Format(TraceCollection traceResult);
     }
 }

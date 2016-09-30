@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Tracer
@@ -11,25 +14,28 @@ namespace Tracer
         private static volatile Tracer instance;
         private static readonly object SyncRoot = new object();
 
-        public TraceResult traseResult;
+        public TraceCollection traseCollection;
 
         private Tracer()
         {
-            this.traseResult = new TraceResult();
+            traseCollection = new TraceCollection();
         }
 
         public void StartTrace()
         {
+            StackFrame stackFrame = new StackFrame(1);
+            MethodBase currentMethod = stackFrame.GetMethod();
+            traseCollection.StartTraceMethod(Thread.CurrentThread.ManagedThreadId, currentMethod);
         }
 
         public void StopTrace()
         {
+            StackFrame stackFrame = new StackFrame(1);
+            MethodBase currentMethod = stackFrame.GetMethod();
+            traseCollection.StopTraceMethod(Thread.CurrentThread.ManagedThreadId, currentMethod);
         }
 
-        public TraceResult GetTraceResult()
-        {
-            return this.traseResult;
-        }
+        
 
         public static Tracer Instance()
         {
@@ -43,6 +49,12 @@ namespace Tracer
             }
             return instance;
         }
+
+        public TraceResult GetTraceResult()
+        {
+            return null ;
+        }
+      
     }
 }
 

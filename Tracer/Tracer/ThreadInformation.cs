@@ -9,28 +9,34 @@ namespace Tracer
     class ThreadInformation
     {
         private readonly Stack<MethodInformation> calledMethod;
-        public List<MethodInformation> childList { get; }
-        private MethodInformation currentMethod;
+        public List<MethodInformation> childList { get; }        
 
         internal ThreadInformation()
         {
             calledMethod = new Stack<MethodInformation>();
-            childList = new List<MethodInformation>();
-            currentMethod = null;
+            childList = new List<MethodInformation>();            
         }
 
-        public void StartTraceMethod(string className, string methodName, List<ParameterInfo> parameters)
+        internal long ExecuteTime => childList.Sum((method) => method.ExecTime);
+
+
+        internal void StartTraceMethod(MethodInformation methodinfo)
         {
-            var method = new MethodInformation(className, methodName, parameters);
-            if (currentMethod == null)
+            if (calledMethod.Count == 0)
             {
-                childList.Add(method);
+                childList.Add(methodinfo);
             }
             else
             {
-                
-                calledMethod.Push(currentMethod);
+                MethodInformation lastMethod = calledMethod.Peek();
+                lastMethod.AddChild(methodinfo);
             }
+        }
+
+        internal void StopTraceMethod()
+        {
+            MethodInformation lastMethod = calledMethod.Pop();
+            lastMethod.StopTraceMethod();
         }
     }
 }
